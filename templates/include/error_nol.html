@@ -1,0 +1,16 @@
+{% for message in get_flashed_messages() %}
+    <div id="flash_error" class="transition-opacity mb-3.5">
+        <p>{{ message }}</p>
+    </div>
+    <script id="flash_error_script">
+        setTimeout(function () {
+            if (document.querySelector("#flash_error") != null) {
+                document.querySelector("#flash_error").style.opacity = 0
+                setTimeout(function () {
+                    document.querySelector("#flash_error").remove()
+                    document.querySelector("#flash_error_script").remove()
+                }, 145)
+            }
+        }, 10000)
+    </script>
+{% endfor %}

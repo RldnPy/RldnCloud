@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko-KR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>개인 클라우드 | {{ title_path }}</title>
+
+    {% include 'include/style.html' %}
+
+</head>
+<body onload="FileList_event();">
+<noscript>어라? 자바스크립트를 사용할수 없어요..</noscript>
+<div class="relative mx-[5vw] my-3 bg-white overflow-hidden z-30">
+    <nav class="bg-white py-3.5 px-3.5">
+        <a class='hover:bg-gray-100 hover:px-1 hover:py-0.5 transition-all duration-200 rounded-lg' href='/'>메뉴</a>
+        <div class="h-full w-0.5 bg-gray-200 py-2.5 inline-block relative top-1"></div>
+        <a class='lg:hover:bg-gray-100 lg:hover:px-1 lg:hover:py-0.5 transition-all duration-200 rounded-lg cursor-pointer' onclick='view_open("upload");'>업로드</a>
+        <div class="h-full w-0.5 bg-gray-200 py-2.5 inline-block relative top-1"></div>
+        {{ path|safe }}
+        <div class="w-full h-px bg-gray-200 mt-1"></div>
+    </nav>
+    <div class="relative mb-3 bg-white px-3.5">
+        {% include 'include/loading.html' %}
+        <div class="transition-opacity" id="main-view">
+            <p class="mb-2.5 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">{{ files_len }}개의 파일및 폴더</p>
+            {% include 'include/error_nol.html' %}
+            <div class="bg-white shadow mb-3 border border-inherit rounded-lg">
+                {% if files_len > 0 %}
+                    {% for i in files %}
+                        <a {% if i.type == "directory" %} onclick="dir_go('{{ i.url }}');" {% else %} onclick="file_view_open('{{ i.path }}/{{ i.name }}');" {% endif %}>
+                            <div class="px-4 py-2 border-b transition duration-200 cursor-pointer {% if i.type == "directory" %}flex justify-between{% endif %} hover:bg-gray-50">
+                                {% if i.type == "file" %}
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis">{{ i.name }}</h3>
+                                {% elif i.type == "directory" %}
+                                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis inline-block max-w-[62vw] lg:max-w-[83vw]">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="stroke-2 inline-block relative bottom-px" viewBox="0 0 16 16">
+                                            <path d="M1 3.5A1.5 1.5 0 0 1 2.5 2h2.764c.958 0 1.76.56 2.311 1.184C7.985 3.648 8.48 4 9 4h4.5A1.5 1.5 0 0 1 15 5.5v7a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12.5v-9zM2.5 3a.5.5 0 0 0-.5.5V6h12v-.5a.5.5 0 0 0-.5-.5H9c-.964 0-1.71-.629-2.174-1.154C6.374 3.334 5.82 3 5.264 3H2.5zM14 7H2v5.5a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5V7z"/>
+                                        </svg>
+                                        {{ i.name }}
+                                    </h3>
+                                    <div class="flex-initial">
+                                        <div onclick="dir_view_open('{{ i.path }}/{{ i.name }}');" class='transition-all duration-200 rounded-lg mx-1.5 hover:bg-gray-100 hover:px-1 hover:py-0.5 cursor-pointer'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="fill-slate-300 stroke-2 inline-block transition-colors duration-200 relative hover:fill-slate-500" viewBox="0 0 16 16">
+                                                <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {% if i.type == "file" %}
+                                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">{{ i.bytes_str }}</p>
+                                {% endif %}
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% else %}
+                    <div class="px-4 py-2 border-b"><p>파일이 없습니다 :(</p></div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="transition-opacity" id="file-view" style="display: none; opacity: 0;">
+            <div class="bg-white shadow mb-3 border border-inherit rounded-lg py-1.5">
+                <div class="px-4 py-4">
+                    <a onclick="view_open('main');" class='transition-all duration-200 rounded-lg mx-1.5 hover:bg-gray-100 hover:px-1 hover:py-0.5 cursor-pointer'>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="fill-slate-700 stroke-2 inline-block relative bottom-[3px]" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"></path>
+                        </svg>
+                    </a>
+                    <div class="h-full w-0.5 bg-gray-200 py-2.5 inline-block relative top-1 mr-2"></div>
+
+                    <a onclick='setTimeout(function () {document.querySelector("#page_loading").style.display = "none"}, 0)' id="file-view-download" class="ml-1 cursor-pointer text-base items-center px-2 py-2 font-semibold transition duration-200 leading-6 text-sm shadow rounded-md text-white bg-blue-500 hover:bg-blue-600">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="stroke-2 inline-block relative fill-white bottom-0.5 left-[1.72px]" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"></path>
+                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"></path>
+                        </svg>
+                    </a>
+                    <a onclick='setTimeout(function () {document.querySelector("#page_loading").style.display = "none"}, 0)' id="file-view-preview" class="ml-1 cursor-pointer text-base items-center px-2 py-2 font-semibold transition duration-200 leading-6 text-sm shadow rounded-md text-white bg-sky-500 hover:bg-sky-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="stroke-2 inline-block relative fill-white bottom-0.5 left-[1.71px]" viewBox="0 0 16 16">
+                            <path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"></path>
+                            <path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"></path>
+                        </svg>
+                    </a>
+                    <a id="file-view-del" class="ml-1 cursor-pointer text-base items-center px-2 py-2 font-semibold transition duration-200 leading-6 text-sm shadow rounded-md text-white bg-red-500 hover:bg-red-600">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="stroke-2 inline-block relative fill-white" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div class="bg-white shadow mb-3 border border-inherit rounded-lg py-1.5 hidden" id="preview_card">
+                <div class="px-4 py-3">
+                </div>
+            </div>
+            <div class="bg-white shadow mb-3 border border-inherit rounded-lg py-1.5">
+                <div class="px-4 py-2">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">파일 이름</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="file-view-name"></h3>
+                </div>
+                <div class="px-4 py-2">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">파일 위치</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="file-view-path"></h3>
+                </div>
+                <div class="px-4 py-2">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">클라우드 파일 위치</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="file-view-cpath"></h3>
+                </div>
+                <div class="px-4 py-2">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">파일 타입</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="file-view-type"></h3>
+                </div>
+                <div class="px-4 py-2 lg:inline-block border-r">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">크기</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="file-view-size"></h3>
+                </div>
+                <div class="px-4 py-2 lg:inline-block border-r">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">만든 시간</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="file-view-mtime"></h3>
+                </div>
+                <div class="px-4 py-2 lg:inline-block border-r">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">수정한 시간</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="file-view-rtime"></h3>
+                </div>
+                <div class="px-4 py-2 lg:inline-block">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">접근한 시간</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="file-view-atime"></h3>
+                </div>
+            </div>
+        </div>
+        <div class="transition-opacity" id="upload-view" style="display: none; opacity: 0;">
+            <div class="bg-white shadow mb-3 border border-inherit rounded-lg py-1.5">
+                <div class="px-4 py-2">
+                    <div class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis inline-block">
+                        <a onclick="view_open('main');" class='inline-block transition-all duration-200 rounded-lg mx-1.5 hover:bg-gray-100 hover:px-1 hover:py-0.5 cursor-pointer'>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="fill-slate-700 stroke-2 inline-block relative bottom-0.5" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"></path>
+                            </svg>
+                        </a>
+                        <div class="h-full w-0.5 bg-gray-200 py-2.5 inline-block relative top-1 mr-2"></div>
+                        파일 업로드
+                    </div>
+                    <div><p class="relative top-1.5 inline-block text-red-500 overflow-hidden whitespace-nowrap text-ellipsis max-w-[54%]">{{ title_path }}</p> 에 업로드 됩니다.</div>
+                    <form class="flex items-center space-x-6" id="upload-view-input" method="post" action="/api/cloud/upload?back_url={{ url_path }}&path_url={{ url_path }}" enctype="multipart/form-data">
+                        <label class="block mt-2.5">
+                            <input oninput="cloud_file_upload();" type="file" name="file" class="cursor-pointer block w-full text-sm text-slate-500 file:mr-2 file:cursor-pointer file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-blue-500 file:text-white hover:file:bg-blue-600"/>
+                        </label>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="transition-opacity" id="dir-view" style="display: none; opacity: 0;">
+            <div class="bg-white shadow mb-3 border border-inherit rounded-lg py-1.5">
+                <div class="px-4 py-4">
+                    <a onclick="view_open('main');" class='transition-all duration-200 rounded-lg mx-1.5 hover:bg-gray-100 hover:px-1 hover:py-0.5 cursor-pointer'>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="fill-slate-700 stroke-2 inline-block relative bottom-[3px]" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"></path>
+                        </svg>
+                    </a>
+
+                    <div class="h-full w-0.5 bg-gray-200 py-2.5 inline-block relative top-1 mr-2"></div>
+                    <a onclick='setTimeout(function () {document.querySelector("#page_loading").style.display = "none"}, 0)' id="dir-view-download" class="ml-1 cursor-pointer text-base items-center px-2 py-2 font-semibold transition duration-200 leading-6 text-sm shadow rounded-md text-white bg-blue-500 hover:bg-blue-600">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="stroke-2 inline-block relative fill-white bottom-0.5 left-[1.72px]" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"></path>
+                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"></path>
+                        </svg>
+                    </a>
+                    <a id="dir-view-del" class="ml-1 cursor-pointer text-base items-center px-2 py-2 font-semibold transition duration-200 leading-6 text-sm shadow rounded-md text-white bg-red-500 hover:bg-red-600">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="stroke-2 inline-block relative fill-white" viewBox="0 0 16 16">
+                            <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"></path>
+                            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div class="bg-white shadow mb-3 border border-inherit rounded-lg py-1.5">
+                <div class="px-4 py-2">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">폴더 이름</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="dir-view-name"></h3>
+                </div>
+                <div class="px-4 py-2">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">폴더 위치</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="dir-view-path"></h3>
+                </div>
+                <div class="px-4 py-2">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">클라우드 폴더 위치</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="dir-view-cpath"></h3>
+                </div>
+                <div class="px-4 py-2 lg:inline-block border-r">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">크기</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="dir-view-size"></h3>
+                </div>
+                <div class="px-4 py-2 lg:inline-block border-r">
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">만든 시간</p>
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis" id="dir-view-mtime"></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include 'include/script.html' %}
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko-KR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    {% include 'include/style.html' %}
+    <title>Dev. 기우 | Not Found</title>
+</head>
+<body>
+<noscript>어라? 자바스크립트를 사용할수 없어요..</noscript>
+<div id="root">
+    <div>
+        <div>
+            <!-- 메뉴 -->
+            {% include 'include/menu.html' %}
+            <!-- 메뉴 -->
+
+            <!-- 페이지 내용 -->
+            <div class="section">
+                <div class="container" style="max-width: 1000px;">
+                    <div class="grid">
+                        <div class="docuBox docLeft" style="color: rgb(0, 0, 0);font-weight: 400;padding-top: 0;margin-top: 43px;">
+                            <div id="forms">
+                                {% include 'include/error.html' %}
+                                <p id="title">404 Not Found</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 페이지 내용 -->
+
+            <!-- 푸터 -->
+            {% include 'include/footer.html' %}
+            <!-- 푸터 -->
+        </div>
+    </div>
+</div>
+{% include 'include/script.html' %}
+</body>
+</html>

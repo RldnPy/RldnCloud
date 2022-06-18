@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko-KR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>개인 클라우드 | 로그인</title>
+
+    {% include 'include/style.html' %}
+
+</head>
+<body>
+<noscript>어라? 자바스크립트를 사용할수 없어요..</noscript>
+<div class="relative mx-[5vw] my-3 bg-white overflow-hidden">
+    <nav class="bg-white py-3.5 px-3.5">
+        개인 클라우드 | 로그인
+        <div class="w-full h-px bg-gray-200 mt-1"></div>
+    </nav>
+    <div class="relative mb-3 bg-white px-3.5">
+        {% include 'include/error.html' %}
+        {% include 'include/loading.html' %}
+        <form method="post" id="login_form">
+            <div class="mb-3">
+                <label for="id" class="form-label">ID</label>
+                <input type="text" class="focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full sm:text-sm focus:ring-1 border-inherit placeholder-slate-400 bg-white px-3 py-2 border rounded-md focus" id="id" name="id" oninput="input_login_id(this);" onclick="input_login_id(this);">
+                <div class="text-sm text-red-400" id="id_text" style="display: none;">ID를 입력하세요.</div>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="flex">비밀번호</label>
+                <input type="password" name="password" id="password" class="focus:outline-none focus:border-sky-500 focus:ring-sky-500 block w-full sm:text-sm focus:ring-1 border-inherit placeholder-slate-400 bg-white px-3 py-2 border rounded-md focus" oninput="input_login_password(this);" onclick="input_login_password(this);">
+                <div class="text-sm text-red-400" id="password_text" style="display: none;">비밀번호를 입력하세요.</div>
+            </div>
+            <div class="mb-2.5" style="font-size: 15px;">ID와 비밀번호는 서버관리자에게 문의하세요.</div>
+        </form>
+        <button type="button" class="items-center px-4 py-2 font-semibold transition duration-200 leading-6 text-sm shadow rounded-md text-white bg-blue-500 hover:bg-blue-600" onclick="login_submit()">로그인</button>
+
+
+    </div>
+</div>
+
+{% include 'include/script.html' %}
+</body>
+</html>
