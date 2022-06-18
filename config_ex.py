@@ -26,7 +26,7 @@ class CloudSettings:
     """
 
     admin_id = ""
-    admin_password = "@"
+    admin_password = ""
 
     del_user = True
 
