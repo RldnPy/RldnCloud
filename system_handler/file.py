@@ -3,6 +3,7 @@ import os
 from .error import Error
 import datetime
 from mimetypes import guess_type
+import config
 
 class FileBase:
     def __init__(self, data: dict):

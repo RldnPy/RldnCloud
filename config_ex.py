@@ -21,19 +21,22 @@ class CloudSettings:
 
     admin_id: 관리자 계정 ID
     admin_password: 관리자 계정 비밀번호
-
     del_user: 파일 삭제시 사용자 확인 페이지 활성화 여부 (True/False)
+
+    preview_ban: 파일 미리보기에서 불가능하도록할 확장자 (List[Str])
     """
 
     admin_id = ""
     admin_password = ""
-
     del_user = True
+
+    preview_ban = ["html", "php", "mhtml", "htm", "rfc822"]
 
 
 class Debug:
     debug = False
-    version = "1.0"
+    version = "1.1.0"
+    version_day = "220701"
 
     open_url = ""
     port = 5000

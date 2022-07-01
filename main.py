@@ -1,5 +1,5 @@
 #-*- coding:utf-8 -*-
-from flask import Flask, request, render_template, url_for, session, send_file, flash, jsonify, Response, send_from_directory
+from flask import Flask, request, render_template, url_for, session, send_file, flash, jsonify, __version__
 from flask import redirect as redirectss
 import config, os, asyncio
 from flask_talisman import Talisman
@@ -8,6 +8,7 @@ import io
 import zipfile
 import psutil
 import shutil
+from sys import version
 
 if config.Debug.debug: url = config.Debug.url
 else: url = config.WebSettings.url
@@ -57,7 +58,7 @@ async def login():
         return redirect(back_url)
 
 @app.route('/file/download/<path:path>', methods=["GET"])
-def file_download(path: str):
+async def file_download(path: str):
     if not system_client.login_check: return redirect("/cloud")
     path_list = path.split("/")
     if str(path_list[0]) != str(system_client.cloud.setting_json.get("cloud_path")).split("/")[0]: path = f"{str(system_client.cloud.setting_json.get('cloud_path'))}/{path}"
@@ -81,11 +82,16 @@ def file_download(path: str):
         return send_file(dirzip, as_attachment=True, download_name=f"{path.split('/')[-1]}.zip", mimetype="application/zip")
 
 @app.route('/file/preview/<path:path>', methods=["GET"])
-def file_preview(path: str):
+async def file_preview(path: str):
     if not system_client.login_check: return redirect("/cloud")
     path_list = path.split("/")
     if str(path_list[0]) != str(system_client.cloud.setting_json.get("cloud_path")).split("/")[0]: path = f"{str(system_client.cloud.setting_json.get('cloud_path'))}/{path}"
     if not os.path.isfile(str(path)): return "404", 404
+    try: data = await system_client.cloud.get_file(path)
+    except Error.NotFound: return "404", 404
+    if str((data.mimetype).split("/")[-1]).lower() in config.CloudSettings.preview_ban:
+        flash("해당 파일은 미리 보기 할 수 없습니다.")
+        return redirect("/cloud")
     return send_file(path, as_attachment=False)
 
 @app.route("/file/delete/<path:path>", methods=["GET", "POST"])
@@ -149,7 +155,8 @@ async def api_GetFile(path: str):
         "make_time_str": data.make_time_str,
         "revise_time_str": data.revise_time_str,
         "mimetype": data.mimetype,
-        "type": data.type
+        "type": data.type,
+        "preview_ban": str((data.mimetype).split("/")[-1]).lower() in config.CloudSettings.preview_ban
     })
 
 @app.route("/api/directory/<path:path>", methods=["GET"])
@@ -243,7 +250,13 @@ async def system_index():
         cloud_disk["total"] = str(system_client._byte_transform(disk.total, "g", 2)) + "GB"
         cloud_disk["use"] = str(system_client._byte_transform(disk.used, "g", 2)) + "GB"
         cloud_disk["free"] = str(system_client._byte_transform(disk.free, "g", 2)) + "GB"
-    return render_template("system/index.html", cloud_disk = cloud_disk)
+
+    system_data = {
+        "client_var": f"{config.Debug.version} ({config.Debug.version_day})",
+        "python_var": version.split(' ')[0],
+        "flask_var": __version__,
+    }
+    return render_template("system/index.html", cloud_disk = cloud_disk, system_data=system_data)
 
 @app.route("/system/reboot", methods=["GET", "POST"])
 async def system_reboot():

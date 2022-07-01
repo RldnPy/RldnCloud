@@ -93,7 +93,16 @@
                         })
                     })
                     document.querySelector("#file-view-download").href = ("/file/download/" + cloud_path_str.replaceAll("//", "/") + "/" + data["name"]).replaceAll("//", "/")
-                    document.querySelector("#file-view-preview").href = ("/file/preview/" + cloud_path_str.replaceAll("//", "/") + "/" + data["name"]).replaceAll("//", "/")
+                    if (data["preview_ban"]) {
+                        document.querySelector("#file-view-preview").href = ""
+                        document.querySelector("#file-view-preview").classList.add("opacity-50")
+                        document.querySelector("#file-view-preview").classList.add("pointer-events-none")
+                    } else {
+                        document.querySelector("#file-view-preview").href = ("/file/preview/" + cloud_path_str.replaceAll("//", "/") + "/" + data["name"]).replaceAll("//", "/")
+                        document.querySelector("#file-view-preview").classList.remove("opacity-50")
+                        document.querySelector("#file-view-preview").classList.remove("pointer-events-none")
+                    }
+
                 }
             )
         view_open("file")
