@@ -39,6 +39,7 @@ def get_system():
     f = open(__file__, 'r', encoding="utf-8")
     main_file = f.read()
     modified_main = str(main_file) != str(get_files)
+    if modified_main: web_logging.warning("시스템 수정이 감지되었습니다. 버그 발생을 주의하세요.")
 
 get_system()
 
