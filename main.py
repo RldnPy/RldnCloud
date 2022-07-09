@@ -38,11 +38,10 @@ def get_system():
     get_files = str(get_file.text)
     f = open(__file__, 'r', encoding="utf-8")
     main_file = f.read()
+    print(str(main_file) != str(get_files), str(main_file) == str(get_files))
     modified_main = str(main_file) != str(get_files)
 
 get_system()
-
-print(modified_main)
 
 def redirect(location: str):
     if "https://" in location or "http://" in location: return redirectss(location)
