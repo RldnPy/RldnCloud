@@ -12,6 +12,9 @@ from sys import version
 import aiohttp
 from requests import get as requests_get
 
+config_version = "1.1.5"
+config_version_day = "220709"
+
 if config.Debug.debug: url = config.Debug.url
 else: url = config.WebSettings.url
 
@@ -26,10 +29,10 @@ def get_system():
     else:
         get_datas = str(get_data.text)
         var_list, var_time, now_var = eval(get_datas.split("|")[0]), eval(get_datas.split("|")[1]), eval(get_datas.split("|")[2])
-        if not str(config.Debug.version) in var_list or str(config.Debug.version_day) != str(var_time[str(config.Debug.version)]):
+        if not str(config_version) in var_list or str(config_version_day) != str(var_time[str(config_version)]):
             web_logging.warning("릴리즈 시간또는 버전이 맞지 않습니다.")
             exit()
-        elif str(config.Debug.version) != now_var:
+        elif str(config_version) != now_var:
             now_varb = True
             web_logging.info(f"새로운 {now_var}({str(var_time[str(now_var)])}) 버전이 있습니다!")
 
@@ -282,7 +285,7 @@ async def system_index():
         cloud_disk["free"] = str(system_client._byte_transform(disk.free, "g", 2)) + "GB"
 
     system_data = {
-        "client_var": f"{config.Debug.version} ({config.Debug.version_day})",
+        "client_var": f"{config_version} ({config_version_day})",
         "python_var": version.split(' ')[0],
         "flask_var": __version__,
         "modified_main": modified_main,

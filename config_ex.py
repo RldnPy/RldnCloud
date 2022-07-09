@@ -40,8 +40,6 @@ class Debug:
     수정할 경우 시스템에 문제가 생길수 있습니다.
     """
     debug = False
-    version = "1.1.5"
-    version_day = "220709"
 
     open_url = ""
     port = 5000
