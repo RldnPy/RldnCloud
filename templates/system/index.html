@@ -46,9 +46,15 @@
             <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis">클라이언트 버전: {{ system_data.client_var }}</h3>
             <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis">Python 버전: {{ system_data.python_var }}</h3>
             <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis">Flask 버전: {{ system_data.flask_var }}</h3>
+            {% if system_data.now_varb %}
+                <h3 class="text-lg leading-6 font-medium text-red-500 overflow-hidden whitespace-nowrap text-ellipsis">새로운 버전이 공개되었습니다! 업데이트를 해주세요!</h3>
+            {% endif %}
+            {% if system_data.modified_main %}
+                <h3 class="text-lg leading-6 font-medium text-red-500 overflow-hidden whitespace-nowrap text-ellipsis">[ 수정된 시스템 ]</h3>
+            {% endif %}
         </div>
         <div class="py-1">
-            <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis">System - ⓒ 2022-present 기우 ALL RIGHTS RESERVED. (MIT License)</h3>
+            <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis">System - ⓒ 2022-present 기우 ALL RIGHTS RESERVED. (GPL-3.0 license)</h3>
             <h3 class="text-lg leading-6 font-medium text-gray-900 overflow-hidden whitespace-nowrap text-ellipsis">TailwindCss - Copyright (c) Tailwind Labs, Inc. (MIT License)</h3>
         </div>
         <div class="py-1">

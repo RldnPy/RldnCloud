@@ -3,15 +3,45 @@ from flask import Flask, request, render_template, url_for, session, send_file, 
 from flask import redirect as redirectss
 import config, os, asyncio
 from flask_talisman import Talisman
-from system_handler import Client, Error
+from system_handler import Client, Error, web_logging
 import io
 import zipfile
 import psutil
 import shutil
 from sys import version
+import aiohttp
+from requests import get as requests_get
 
 if config.Debug.debug: url = config.Debug.url
 else: url = config.WebSettings.url
+
+modified_main, now_varb = None, None
+
+def get_system():
+    global modified_main, now_varb
+    now_varb, modified_main = False, False
+    get_data = requests_get("https://raw.githubusercontent.com/RldnPy/RldnCloud/main/system_")
+    if get_data.status_code != 200: web_logging.warning("시스템 확인을 위한 깃허브에 접속할 수 없습니다.")
+    elif "Not Found" in str(get_data.text): web_logging.warning("시스템 확인을 위한 깃허브에 접속할 수 없습니다.")
+    else:
+        get_datas = str(get_data.text)
+        var_list, var_time, now_var = eval(get_datas.split("|")[0]), eval(get_datas.split("|")[1]), eval(get_datas.split("|")[2])
+        if not str(config.Debug.version) in var_list or str(config.Debug.version_day) != str(var_time[str(config.Debug.version)]):
+            web_logging.warning("릴리즈 시간또는 버전이 맞지 않습니다.")
+            exit()
+        elif str(config.Debug.version) != now_var:
+            now_varb = True
+            web_logging.info(f"새로운 {now_var}({str(var_time[str(now_var)])}) 버전이 있습니다!")
+
+    get_file = requests_get("https://raw.githubusercontent.com/RldnPy/RldnCloud/main/main.py")
+    if get_file.status_code != 200: web_logging.warning("파일 확인을 위한 깃허브에 접속할 수 없습니다.")
+    elif "Not Found" in str(get_file.text): web_logging.warning("파일 확인을 위한 깃허브에 접속할 수 없습니다.")
+    get_files = str(get_file.text)
+    f = open(__file__, 'r', encoding="utf-8")
+    main_file = f.read()
+    modified_main = str(main_file) != str(get_files)
+
+get_system()
 
 def redirect(location: str):
     if "https://" in location or "http://" in location: return redirectss(location)
@@ -227,7 +257,7 @@ async def cloud_index(path: str = None):
     url_path = (path or "/").split("/")
     if url_path[0] == "클라우드": del url_path[0]
 
-    return render_template("cloud/file_list.html", path=path_i, title_path=path or "클라우드", url_path="/".join(url_path), files=data, files_len = len(data))
+    return render_template("cloud/file_list.html", path=path_i, title_path=path or "클라우드", url_path="/".join(url_path), files=data, files_len = len(data), files_len_format = format(len(data), ","))
 
 @app.route("/system", methods=["GET", "POST"])
 async def system_index():
@@ -255,6 +285,8 @@ async def system_index():
         "client_var": f"{config.Debug.version} ({config.Debug.version_day})",
         "python_var": version.split(' ')[0],
         "flask_var": __version__,
+        "modified_main": modified_main,
+        "now_varb": now_varb
     }
     return render_template("system/index.html", cloud_disk = cloud_disk, system_data=system_data)
 
@@ -288,6 +320,9 @@ async def system_shutdown():
 
         return render_template("system/shutdown.html")
 
+if modified_main == None or now_varb == None:
+    web_logging.warning("시스템 확인이 진행 되지 않음")
+    exit()
 
 if config.Debug.debug: app.run(config.Debug.open_url, port=config.Debug.port, debug=True)
 else: app.run(config.WebSettings.open_url, port=config.WebSettings.port)

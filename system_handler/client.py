@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 from .error import Error
 from flask import session, flash
 import jwt

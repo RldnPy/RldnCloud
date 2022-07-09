@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 class WebSettings:
     """
     웹 설정
@@ -34,9 +35,13 @@ class CloudSettings:
 
 
 class Debug:
+    """
+    개발을 위해 있는 부분입니다.
+    수정할 경우 시스템에 문제가 생길수 있습니다.
+    """
     debug = False
-    version = "1.1.0"
-    version_day = "220701"
+    version = "1.1.5"
+    version_day = "220709"
 
     open_url = ""
     port = 5000

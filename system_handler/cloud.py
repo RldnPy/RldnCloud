@@ -1,3 +1,4 @@
+#-*- coding:utf-8 -*-
 from .json_handler import Json
 import os
 from typing import Optional, Union, List

@@ -1,5 +1,6 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>
 
 <script>
 
@@ -34,112 +35,6 @@
         window.onbeforeunload = function (e) {
             document.querySelector("#page_loading").style.display = "block"
         };
-    }
-
-    function file_view_open(path) {
-        fetch("/api/file/" + path)
-            .then((response) => response.json())
-            .then((data) => {
-
-                    var cloud_path_list = data["cloud_path"].split("/")
-                    if (cloud_path_list[0] === "클라우드") {cloud_path_list.splice(0, 1)}
-
-                    var cloud_path_str = cloud_path_list.join("/")
-
-                    document.querySelector("#file-view-name").innerHTML = data["name"]
-                    document.querySelector("#file-view-path").innerHTML = data["server_path"]
-                    document.querySelector("#file-view-cpath").innerHTML = data["cloud_path"]
-                    document.querySelector("#file-view-size").innerHTML = data["bytes_str"]
-                    document.querySelector("#file-view-mtime").innerHTML = data["make_time_str"]
-                    document.querySelector("#file-view-rtime").innerHTML = data["revise_time_str"]
-                    document.querySelector("#file-view-rtime").innerHTML = data["revise_time_str"]
-                    document.querySelector("#file-view-atime").innerHTML = data["access_time_str"]
-                    document.querySelector("#file-view-type").innerHTML = data["mimetype"]
-
-                    var mimetype = String(data["mimetype"]).split("/")
-
-                    if (mimetype[0] === "image") {
-                        document.querySelector("#preview_card").classList.replace("hidden", "block")
-                        document.querySelector("#preview_card").classList.remove("lg:block")
-                        document.querySelector("#preview_card > div").innerHTML = '<img src="' + ("/file/preview/" + cloud_path_str.replaceAll("//", "/") + "/" + data["name"]).replaceAll("//", "/") + '" class="lg:max-w-[24%] rounded-lg" alt="' + data["name"] + '">'
-                    } else if (mimetype[0] === "video") {
-                        document.querySelector("#preview_card").classList.replace("hidden", "block")
-                        document.querySelector("#preview_card").classList.remove("lg:block")
-                        document.querySelector("#preview_card > div").innerHTML = '<video controls class="max-w-full lg:max-w-[24%] rounded-lg"><source src="' + ("/file/preview/" + cloud_path_str.replaceAll("//", "/") + "/" + data["name"]).replaceAll("//", "/") + '" type="' + data["mimetype"] + '"></video>'
-                    } else if (mimetype[1] === "pdf") {
-                        document.querySelector("#preview_card").classList.replace("block", "hidden")
-                        document.querySelector("#preview_card").classList.add("lg:block")
-                        document.querySelector("#preview_card > div").innerHTML = '<iframe src="' + ("/file/preview/" + cloud_path_str.replaceAll("//", "/") + "/" + data["name"]).replaceAll("//", "/") + '" class="max-w-full lg:w-[49vw] lg:h-[25vw] rounded-lg"></iframe>'
-                    } else {
-                        document.querySelector("#preview_card").classList.replace("block", "hidden")
-                        document.querySelector("#preview_card").classList.remove("lg:block")
-                        document.querySelector("#preview_card > div").innerHTML = ''
-                    }
-
-                    document.querySelector("#file-view-del").addEventListener("click", function () {
-                        Swal.fire({
-                            title: '삭제 할까요?',
-                            text: "클라우드에서 영구 삭제됩니다!",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: '삭제하기',
-                            cancelButtonText: '취소하기'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = "/file/delete/" + data["server_path"] + "/" + data["name"] + "?back_url=" + cloud_path_str.replaceAll("//", "/")
-                            }
-                        })
-                    })
-                    document.querySelector("#file-view-download").href = ("/file/download/" + cloud_path_str.replaceAll("//", "/") + "/" + data["name"]).replaceAll("//", "/")
-                    if (data["preview_ban"]) {
-                        document.querySelector("#file-view-preview").href = ""
-                        document.querySelector("#file-view-preview").classList.add("opacity-50")
-                        document.querySelector("#file-view-preview").classList.add("pointer-events-none")
-                    } else {
-                        document.querySelector("#file-view-preview").href = ("/file/preview/" + cloud_path_str.replaceAll("//", "/") + "/" + data["name"]).replaceAll("//", "/")
-                        document.querySelector("#file-view-preview").classList.remove("opacity-50")
-                        document.querySelector("#file-view-preview").classList.remove("pointer-events-none")
-                    }
-
-                }
-            )
-        view_open("file")
-    }
-
-    function dir_view_open(path) {
-        fetch("/api/directory/" + path)
-            .then((response) => response.json())
-            .then((data) => {
-                    var cloud_path_list = data["cloud_path"].split("/")
-                    if (cloud_path_list[0] === "클라우드") {cloud_path_list.splice(0, 1)}
-                    var cloud_path_str = cloud_path_list.join("/")
-                    document.querySelector("#dir-view-name").innerHTML = data["name"]
-                    document.querySelector("#dir-view-path").innerHTML = data["server_path"]
-                    document.querySelector("#dir-view-cpath").innerHTML = data["cloud_path"]
-                    document.querySelector("#dir-view-size").innerHTML = data["bytes_str"]
-                    document.querySelector("#dir-view-mtime").innerHTML = data["make_time_str"]
-                    document.querySelector("#dir-view-download").href = ("/file/download/" + cloud_path_str.replaceAll("//", "/") + "/" + data["name"]).replaceAll("//", "/")
-                    document.querySelector("#dir-view-del").addEventListener("click", function () {
-                        Swal.fire({
-                            title: '삭제 할까요?',
-                            text: "폴더가 클라우드에서 영구 삭제됩니다!",
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#3085d6',
-                            cancelButtonColor: '#d33',
-                            confirmButtonText: '삭제하기',
-                            cancelButtonText: '취소하기'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.href = "/file/delete/" + data["server_path"] + "/" + data["name"] + "?back_url=" + cloud_path_str.replaceAll("//", "/")
-                            }
-                        })
-                    })
-                }
-            )
-        view_open("dir")
     }
 
     function dir_go(href) {
@@ -244,6 +139,16 @@
             })
         }
     }
+
+    $("input[name='create_file_type']:radio").change(function () {
+        var value = this.value;
+        if (value === "path") {
+            $("label[id='create_name']")[0].innerHTML = "폴더의 이름"
+        } else {
+            $("label[id='create_name']")[0].innerHTML = "파일 이름 (확장자 포함)"
+        }
+    });
+
 
 </script>
 
