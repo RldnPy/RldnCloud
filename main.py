@@ -35,7 +35,6 @@ def get_system():
 
     get_file = requests_get("https://raw.githubusercontent.com/RldnPy/RldnCloud/main/main.py")
     if get_file.status_code != 200: web_logging.warning("파일 확인을 위한 깃허브에 접속할 수 없습니다.")
-    elif "Not Found" in str(get_file.text): web_logging.warning("파일 확인을 위한 깃허브에 접속할 수 없습니다.")
     get_files = str(get_file.text)
     f = open(__file__, 'r', encoding="utf-8")
     main_file = f.read()
