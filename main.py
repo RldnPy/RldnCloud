@@ -42,6 +42,8 @@ def get_system():
 
 get_system()
 
+print(modified_main)
+
 def redirect(location: str):
     if "https://" in location or "http://" in location: return redirectss(location)
     return redirectss(f"{url}{location}")
