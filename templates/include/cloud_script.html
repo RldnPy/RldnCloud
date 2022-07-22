@@ -152,15 +152,23 @@
             var percentage_complete = (loaded / total) * 100;
             document.querySelector("#upload_progressbar").style.width = Math.floor(percentage_complete) + "%"
             document.querySelector("#upload_progressmsg").innerHTML = `${formatBytes(loaded)} / ${formatBytes(total)}`
-
         })
 
         request.addEventListener("load", function(e) {
             if (request.status === 200) {
                 document.cookie = `upload_message=${filename} 파일이 업로드 되었습니다.`;
                 location.reload();
+            } else {
+                document.querySelector("#upload_progressbar").classList.replace("bg-sky-500", "bg-red-400")
+                document.querySelector("#upload_progressmsg").innerHTML = '파일 업로드의 실패하였습니다'
             }
             reset();
+        })
+
+        request.addEventListener("error", function (e) {
+            reset();
+            document.querySelector("#upload_progressbar").classList.replace("bg-sky-500", "bg-red-400")
+            document.querySelector("#upload_progressmsg").innerHTML = '파일 업로드의 실패하였습니다'
         })
 
         request.open('post', url);
