@@ -26,6 +26,25 @@
                 <p class="mb-2.5 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis">{{ files_len_format }}개의 파일및 폴더</p>
             </div>
             {% include 'include/error_nol.html' %}
+            {% if upload_message != None %}
+                <div id="flash_error" class="transition-opacity mb-3.5">
+                    <p>{{ upload_message }}</p>
+                </div>
+                <script id="flash_error_script">
+                    function deleteCookie(name) {document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';}
+                    deleteCookie("upload_message")
+
+                    setTimeout(function () {
+                        if (document.querySelector("#flash_error") != null) {
+                            document.querySelector("#flash_error").style.opacity = 0
+                            setTimeout(function () {
+                                document.querySelector("#flash_error").remove()
+                                document.querySelector("#flash_error_script").remove()
+                            }, 145)
+                        }
+                    }, 10000)
+                </script>
+            {% endif %}
             <div class="bg-white shadow mb-3 border border-inherit rounded-lg">
                 {% if files_len > 0 %}
                     {% for i in files %}
@@ -147,15 +166,16 @@
                 <div class="py-2">
                     <div class="px-4 hidden" id="upload_progressbar_com">
                         <div class="bg-white mb-3 transition duration-200 border border-inherit h-5 w-auto lg:w-[16vw] rounded-md">
-                            <div class="pb-px bg-sky-500 pt-[18px] inline-block rounded-md" id="upload_progressbar"></div>
+                            <div class="pb-px bg-sky-500 pt-[18px] inline-block rounded-md transition-all duration-200" id="upload_progressbar"></div>
                         </div>
+                        <p class="mb-2.5 max-w-2xl text-sm text-gray-500 overflow-hidden whitespace-nowrap text-ellipsis" id="upload_progressmsg">{{ files_len_format }}개의 파일및 폴더</p>
                     </div>
                     <div class="px-4">
                         <form class="flex items-center space-x-6" id="upload-view-input" method="post" action="/api/cloud/upload?back_url={{ url_path }}&path_url={{ url_path }}" enctype="multipart/form-data">
-                            <label class="block">
-                                <input oninput="cloud_file_upload();" type="file" name="file" class="cursor-pointer block w-full text-sm text-slate-500 file:mr-2 file:cursor-pointer file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-blue-500 file:text-white hover:file:bg-blue-600"/>
-                            </label>
                         </form>
+                        <label class="block">
+                            <input oninput="cloud_file_upload('/api/cloud/upload?back_url={{ url_path }}&path_url={{ url_path }}');" id="upload_input" type="file" name="file" class="cursor-pointer block w-full text-sm text-slate-500 file:mr-2 file:cursor-pointer file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-blue-500 file:text-white hover:file:bg-blue-600"/>
+                        </label>
                     </div>
                 </div>
             </div>

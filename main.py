@@ -12,7 +12,7 @@ from sys import version
 import aiohttp
 from requests import get as requests_get
 
-config_version = "1.1.7"
+config_version = "1.1.8"
 config_version_day = "220722"
 
 if config.Debug.debug: url = config.Debug.url
@@ -231,8 +231,6 @@ async def cloud_file_upload():
             v += 1
         add_filename = f"({v})"
     f.save(system_client.cloud.setting_json.get("cloud_path") + f"/{path_url}/" + ".".join(f.filename.split('.')[:-1]) + add_filename + f".{f.filename.split('.')[-1]}")
-    save_filename = ".".join(f.filename.split('.')[:-1]) + add_filename + f".{f.filename.split('.')[-1]}"
-    flash(f"{save_filename} 파일이 업로드 되었습니다.")
     return redirect("/cloud/" + back_url)
 
 @app.route("/cloud/", methods=["GET", "POST"])
@@ -259,8 +257,7 @@ async def cloud_index(path: str = None):
 
     url_path = (path or "/").split("/")
     if url_path[0] == "클라우드": del url_path[0]
-
-    return render_template("cloud/file_list.html", path=path_i, title_path=path or "클라우드", url_path="/".join(url_path), files=data, files_len = len(data), files_len_format = format(len(data), ","))
+    return render_template("cloud/file_list.html", path=path_i, title_path=path or "클라우드", url_path="/".join(url_path), files=data, files_len = len(data), files_len_format = format(len(data), ","), upload_message = request.cookies.get('upload_message', None))
 
 @app.route("/system", methods=["GET", "POST"])
 async def system_index():

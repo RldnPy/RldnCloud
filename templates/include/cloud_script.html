@@ -119,25 +119,55 @@
         view_open("dir")
     }
 
-    function cloud_file_upload() {
-        document.querySelector("#upload-view-input").submit()
-        document.querySelector("#page_loading").style.display = "block"
+    function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
 
-        var element = document.querySelector("#upload_progressbar");
-        var width = 0;
-        var identity = setInterval(scene, 10);
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
-        document.querySelector("#upload_progressbar_com").classList.replace("hidden", "block")
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-        function scene() {
-            if (width >= 100) {
-                clearInterval(identity);
-            } else {
-                width++;
-                element.style.width = width + '%';
-            }
-        }
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     }
+
+    function cloud_file_upload(url) {
+        var input = document.querySelector("#upload_input")
+
+        input.disabled = true
+
+        var data = new FormData()
+        var request = new XMLHttpRequest()
+        var file = input.files[0];
+
+        var filename = file.name;
+
+        data.append("file", file);
+
+        request.upload.addEventListener("progress", function(e) {
+            document.querySelector("#upload_progressbar_com").classList.replace("hidden", "block")
+            var loaded = e.loaded;
+            var total = e.total;
+
+            var percentage_complete = (loaded / total) * 100;
+            document.querySelector("#upload_progressbar").style.width = Math.floor(percentage_complete) + "%"
+            document.querySelector("#upload_progressmsg").innerHTML = `${formatBytes(loaded)} / ${formatBytes(total)}`
+
+        })
+
+        request.addEventListener("load", function(e) {
+            if (request.status === 200) {
+                document.cookie = `upload_message=${filename} 파일이 업로드 되었습니다.`;
+                location.reload();
+            }
+            reset();
+        })
+
+        request.open('post', url);
+        request.send(data);
+    }
+
+
 
     function view_open(view) {
         if (view === "main") {
