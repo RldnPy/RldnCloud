@@ -118,4 +118,76 @@
             )
         view_open("dir")
     }
+
+    function cloud_file_upload() {
+        document.querySelector("#upload-view-input").submit()
+        document.querySelector("#page_loading").style.display = "block"
+
+        var element = document.querySelector("#upload_progressbar");
+        var width = 0;
+        var identity = setInterval(scene, 10);
+
+        document.querySelector("#upload_progressbar_com").classList.replace("hidden", "block")
+
+        function scene() {
+            if (width >= 100) {
+                clearInterval(identity);
+            } else {
+                width++;
+                element.style.width = width + '%';
+            }
+        }
+    }
+
+    function view_open(view) {
+        if (view === "main") {
+            document.querySelector("#main-view").style.display = "block"
+            setTimeout(function () {document.querySelector("#main-view").style.opacity = 1}, 1)
+            document.querySelector("#dir-view").style.position = "absolute"
+            document.querySelector("#dir-view").style.opacity = 0
+            setTimeout(function () {document.querySelector("#dir-view").style.display = "none"; document.querySelector("#dir-view").style.position = "initial"}, 145)
+            document.querySelector("#file-view").style.position = "absolute"
+            document.querySelector("#file-view").style.opacity = 0
+            setTimeout(function () {document.querySelector("#file-view").style.display = "none"; document.querySelector("#file-view").style.position = "initial"}, 145)
+            document.querySelector("#upload-view").style.position = "absolute"
+            document.querySelector("#upload-view").style.opacity = 0
+            setTimeout(function () {document.querySelector("#upload-view").style.display = "none"; document.querySelector("#upload-view").style.position = "initial"}, 145)
+        } else if (view === "dir") {
+            document.querySelector("#dir-view").style.display = "block"
+            setTimeout(function () {document.querySelector("#dir-view").style.opacity = 1}, 1)
+            document.querySelector("#dir-view").style.position = "absolute"
+            document.querySelector("#main-view").style.opacity = 0
+            setTimeout(function () {document.querySelector("#main-view").style.display = "none"; document.querySelector("#dir-view").style.position = "initial"}, 145)
+            document.querySelector("#file-view").style.position = "absolute"
+            document.querySelector("#file-view").style.opacity = 0
+            setTimeout(function () {document.querySelector("#file-view").style.display = "none"; document.querySelector("#file-view").style.position = "initial"}, 145)
+            document.querySelector("#upload-view").style.position = "absolute"
+            document.querySelector("#upload-view").style.opacity = 0
+            setTimeout(function () {document.querySelector("#upload-view").style.display = "none"; document.querySelector("#upload-view").style.position = "initial"}, 145)
+        } else if (view === "file") {
+            document.querySelector("#file-view").style.display = "block"
+            setTimeout(function () {document.querySelector("#file-view").style.opacity = 1}, 1)
+            document.querySelector("#file-view").style.position = "absolute"
+            document.querySelector("#main-view").style.opacity = 0
+            setTimeout(function () {document.querySelector("#main-view").style.display = "none"; document.querySelector("#file-view").style.position = "initial"}, 145)
+            document.querySelector("#dir-view").style.position = "absolute"
+            document.querySelector("#dir-view").style.opacity = 0
+            setTimeout(function () {document.querySelector("#dir-view").style.display = "none"; document.querySelector("#dir-view").style.position = "initial"}, 145)
+            document.querySelector("#upload-view").style.position = "absolute"
+            document.querySelector("#upload-view").style.opacity = 0
+            setTimeout(function () {document.querySelector("#upload-view").style.display = "none"; document.querySelector("#upload-view").style.position = "initial"}, 145)
+        } else if (view === "upload") {
+            document.querySelector("#upload-view").style.display = "block"
+            setTimeout(function () {document.querySelector("#upload-view").style.opacity = 1}, 1)
+            document.querySelector("#upload-view").style.position = "absolute"
+            document.querySelector("#main-view").style.opacity = 0
+            setTimeout(function () {document.querySelector("#main-view").style.display = "none"; document.querySelector("#upload-view").style.position = "initial"}, 145)
+            document.querySelector("#dir-view").style.position = "absolute"
+            document.querySelector("#dir-view").style.opacity = 0
+            setTimeout(function () {document.querySelector("#dir-view").style.display = "none"; document.querySelector("#dir-view").style.position = "initial"}, 145)
+            document.querySelector("#file-view").style.position = "absolute"
+            document.querySelector("#file-view").style.opacity = 0
+            setTimeout(function () {document.querySelector("#file-view").style.display = "none"; document.querySelector("#file-view").style.position = "initial"}, 145)
+        }
+    }
 </script>

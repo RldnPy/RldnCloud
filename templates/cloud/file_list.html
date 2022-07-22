@@ -55,7 +55,7 @@
                         </a>
                     {% endfor %}
                 {% else %}
-                    <div class="px-4 py-2 border-b"><p>파일이 없습니다 :(</p></div>
+                    <div class="px-4 py-2 border-b"><p>파일이 없습니다.</p></div>
                 {% endif %}
             </div>
         </div>
@@ -144,12 +144,19 @@
                 </div>
             </div>
             <div class="bg-white shadow mb-3 border border-inherit rounded-lg py-1.5">
-                <div class="px-4 py-2">
-                    <form class="flex items-center space-x-6" id="upload-view-input" method="post" action="/api/cloud/upload?back_url={{ url_path }}&path_url={{ url_path }}" enctype="multipart/form-data">
-                        <label class="block">
-                            <input oninput="cloud_file_upload();" type="file" name="file" class="cursor-pointer block w-full text-sm text-slate-500 file:mr-2 file:cursor-pointer file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-blue-500 file:text-white hover:file:bg-blue-600"/>
-                        </label>
-                    </form>
+                <div class="py-2">
+                    <div class="px-4 hidden" id="upload_progressbar_com">
+                        <div class="bg-white mb-3 transition duration-200 border border-inherit h-5 w-auto lg:w-[16vw] rounded-md">
+                            <div class="pb-px bg-sky-500 pt-[18px] inline-block rounded-md" id="upload_progressbar"></div>
+                        </div>
+                    </div>
+                    <div class="px-4">
+                        <form class="flex items-center space-x-6" id="upload-view-input" method="post" action="/api/cloud/upload?back_url={{ url_path }}&path_url={{ url_path }}" enctype="multipart/form-data">
+                            <label class="block">
+                                <input oninput="cloud_file_upload();" type="file" name="file" class="cursor-pointer block w-full text-sm text-slate-500 file:mr-2 file:cursor-pointer file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:bg-blue-500 file:text-white hover:file:bg-blue-600"/>
+                            </label>
+                        </form>
+                    </div>
                 </div>
             </div>
             <div class="bg-white shadow mb-3 border border-inherit rounded-lg py-1.5">

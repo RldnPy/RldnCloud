@@ -12,8 +12,8 @@ from sys import version
 import aiohttp
 from requests import get as requests_get
 
-config_version = "1.1.5"
-config_version_day = "220709"
+config_version = "1.1.7"
+config_version_day = "220722"
 
 if config.Debug.debug: url = config.Debug.url
 else: url = config.WebSettings.url
