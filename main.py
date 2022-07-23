@@ -12,8 +12,8 @@ from sys import version
 import aiohttp
 from requests import get as requests_get
 
-config_version = "1.1.8"
-config_version_day = "220722"
+config_version = "1.2.0"
+config_version_day = "220724"
 
 if config.Debug.debug: url = config.Debug.url
 else: url = config.WebSettings.url
@@ -74,6 +74,43 @@ def get_dir_index(path:str) -> int:
         break
 
     return v
+
+@app.route("/api/cloud/create/", methods=["POST"])
+@app.route("/api/cloud/create/<path:path>", methods=["POST"])
+async def api_file_create(path: str = "/"):
+    if not system_client.login_check: return jsonify({"message": "You must be logged in to enable it.", "code": 403}), 403
+    create_name = request.form.get("create_name")
+    create_file_type = request.form.get("create_file_type")
+    if str(path) == "/": path = system_client.cloud.setting_json.get("cloud_path")
+    else:
+        path_list = path.split("/")
+        if str(path_list[0]) != str(system_client.cloud.setting_json.get("cloud_path")).split("/")[0]: path = f"{str(system_client.cloud.setting_json.get('cloud_path'))}/{path}"
+
+    try:
+        if str(create_file_type) == "file":
+            open(f"{path}/{create_name}", 'w', encoding="utf-8").close()
+            flash(f"{create_name} 파일을 생성했습니다.")
+        elif str(create_file_type) == "path":
+            os.mkdir(f"{path}/{create_name}")
+            flash(f"{create_name} 폴더를 생성했습니다.")
+    except FileExistsError: flash("이미 동일한 파일또는 폴더가 있어 생성에 실패했습니다.")
+    except: flash("파일또는 폴더의 생성을 실패했습니다.")
+
+    back_url = str(request.args.get("back_url", "/"))
+    return redirect("/cloud/" + back_url)
+
+@app.route("/api/CCDOF/<name>/<path:path>", methods=["GET"])
+@app.route("/api/CCDOF/<name>/", methods=["GET"])
+async def api_check_DirectoryOrFile(name:str, path: str = "/"):
+    if not system_client.login_check: return jsonify({"message": "You must be logged in to enable it.", "code": 403}), 403
+
+    if str(path) == "/": path = system_client.cloud.setting_json.get("cloud_path") + "/"
+    else:
+        path_list = path.split("/")
+        if str(path_list[0]) != str(system_client.cloud.setting_json.get("cloud_path")).split("/")[0]: path = f"{str(system_client.cloud.setting_json.get('cloud_path'))}/{path}/"
+
+    if os.path.isfile(str(path) + str(name)) or os.path.isdir(str(path) + str(name)): return {"return": True}
+    return {"return": False}
 
 @app.route("/login", methods=["GET", "POST"])
 async def login():

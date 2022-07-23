@@ -37,16 +37,6 @@
         };
     }
 
-    function dir_go(href) {
-        setTimeout(function () {
-            if (document.querySelector("#dir-view").style.display === "none") {
-                var href_list = href.split("/")
-                if (href_list[0] === ".") {href_list[0] = "/cloud"}
-                window.location.href = href_list.join("/")
-            }
-        }, 150)
-    }
-
     function system_server(job) {
         if (job === "reboot") {
             Swal.fire({
@@ -81,15 +71,6 @@
         }
     }
 
-    $("input[name='create_file_type']:radio").change(function () {
-        var value = this.value;
-        if (value === "path") {
-            $("label[id='create_name']")[0].innerHTML = "폴더의 이름"
-        } else {
-            $("label[id='create_name']")[0].innerHTML = "파일 이름 (확장자 포함)"
-        }
-    });
-
 
 </script>
 
@@ -113,8 +94,7 @@
                     '24%': '24%',
                     '1.72px': '1.72px',
                     '1.71px': '1.71px',
-                    '49vw': '49vw',
-                    '25vw': '25vw',
+                    '49vw': '49vw'
                 }
             }
         }
